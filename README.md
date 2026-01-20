@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AwaLane 🇳🇬
 
-## Getting Started
+**AwaLane** is an AI-powered niche discovery dashboard designed specifically for Nigerian content creators. It helps you stop copying what everyone else is doing and find "open lanes"—underserved content niches with high growth potential on TikTok, YouTube, and Instagram.
 
-First, run the development server:
+---
 
+## ✨ Features
+
+- **🔍 AI-Powered Discovery**: Enter any content idea, and AwaLane uses Groq's high-performance AI (Llama 3.3) to analyze 6-8 specific, high-potential niches.
+- **📈 Live Trending Ideas**: Automatic, real-time analysis of current Nigerian social media trends displayed right on the landing page.
+- **🌍 Cultural Relevance**: Insights are tailored to Nigerian culture, including Pidgin English angles, local trends, and underserved local audiences.
+- **📱 Platform-Specific Analysis**: Filter insights by TikTok, YouTube, or Instagram to find the best fit for your content style.
+- **💎 Content Twists**: Every niche suggestion comes with 4 actionable "twists" or content ideas to help you start creating immediately.
+
+---
+
+## 🚀 Tech Stack
+
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **AI Engine**: [Groq Cloud](https://groq.com/) (Llama 3.3 70B Versatile)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+---
+
+## 🛠️ Setup & Installation
+
+### 1. Prerequisites
+- Node.js 20+ installed.
+- A Groq API Key (get one at [console.groq.com](https://console.groq.com/)).
+
+### 2. Clone and Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd niche-discovery-dashboard
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Environment Variables
+Create a `.env.local` file in the root directory and add your Groq API key:
+```env
+GROQ_API_KEY=your_gsk_api_key_here
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to see AwaLane in action.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛡️ Verification & Reliability
 
-To learn more about Next.js, take a look at the following resources:
+AwaLane is built with robust error handling and performance optimizations:
+- **Hydration Fixed**: Consistent SSR and client-side rendering for a smooth first-load experience.
+- **AI Fallbacks**: In case of API limits or outages, the system gracefully handles errors with detailed logging.
+- **Mock Data**: Pre-integrated sample data for testing without live API calls.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Made with ❤️ for Nigerian creators.
+Designed to help you find your unique voice.
