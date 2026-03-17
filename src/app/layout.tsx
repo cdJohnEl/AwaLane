@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -9,10 +11,11 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Niche Discovery Dashboard | Find Your Unique Voice",
+  title: "AwaLane | Discover Your Unique Voice",
   description:
-    "Discover underserved content niches on TikTok, YouTube, and Instagram. Find your unique voice fast – no complicated analytics, just clear suggestions you can use today.",
+    "AwaLane helps Nigerian creators find underserved content niches on TikTok, YouTube, and Instagram. Find your unique voice fast with AI-powered suggestions.",
   keywords: [
+    "AwaLane",
     "content creator",
     "niche finder",
     "TikTok",
@@ -21,6 +24,16 @@ export const metadata: Metadata = {
     "Nigerian creators",
     "content ideas",
   ],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "AwaLane",
+  },
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -29,9 +42,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable} font-sans antialiased`}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

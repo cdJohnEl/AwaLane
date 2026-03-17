@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getTrendingVideos } from "@/lib/youtube";
 
 const client = new OpenAI({
     apiKey: process.env.GROQ_API_KEY || "",
@@ -7,6 +8,7 @@ const client = new OpenAI({
 });
 
 const SYSTEM_PROMPT = `You are a Nigerian social media trend analyst specializing in TikTok, YouTube, and Instagram. 
+Ground your analysis in the provided real-time YouTube trending data for Nigeria. 
 Identify 6 CURRENTLY trending or high-potential underserved niches specifically for Nigerian creators. 
 Consider local culture, current events in Nigeria, and underserved audiences.
 
@@ -18,7 +20,7 @@ Return ONLY valid JSON in this exact format:
       "name": "Niche name here",
       "saturation": "open",
       "saturationLabel": "Open lane",
-      "why": "One sentence explaining why this is trending right now in Nigeria",
+      "why": "One sentence explaining why this is trending right now in Nigeria, referencing real-time trends where applicable.",
       "twists": [
         "Specific content idea 1",
         "Specific content idea 2",
@@ -38,13 +40,19 @@ export async function GET() {
             throw new Error("GROQ_API_KEY is not defined");
         }
 
+        // Fetch real trends from YouTube Data API
+        const youtubeTrends = await getTrendingVideos();
+        const trendsContext = youtubeTrends.length > 0
+            ? `Current real-time YouTube trends in Nigeria: ${youtubeTrends.map((v: any) => v.title).join(", ")}`
+            : "Focus on general high-potential Nigerian creator niches.";
+
         const response = await client.chat.completions.create({
             model: "llama-3.3-70b-versatile",
             messages: [
                 { role: "system", content: SYSTEM_PROMPT },
                 {
                     role: "user",
-                    content: "Find 6 trending content niches for Nigerian creators right now.",
+                    content: `Analyze these current trends and find 6 trending content niches for Nigerian creators right now: \n\n${trendsContext}`,
                 },
             ],
             temperature: 0.8,

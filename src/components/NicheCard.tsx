@@ -55,9 +55,9 @@ export function NicheCard({ niche, index, onClick }: NicheCardProps) {
         </motion.div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg sm:text-xl font-bold text-[#1A1A2E] leading-tight">
+          <h3 className="text-lg sm:text-xl font-bold text-[#1A1A2E] dark:text-white leading-tight">
             {niche.name}
           </h3>
         </div>
@@ -66,7 +66,7 @@ export function NicheCard({ niche, index, onClick }: NicheCardProps) {
           <span
             className={`
             ${saturationColors[niche.saturation]}
-            px-3 py-1 rounded-full text-xs font-semibold
+            px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider
             flex items-center gap-1.5
           `}
           >
@@ -75,19 +75,19 @@ export function NicheCard({ niche, index, onClick }: NicheCardProps) {
           </span>
         </div>
 
-        <p className="text-sm text-[#1A1A2E]/70 leading-relaxed">
+        <p className="text-sm text-[#1A1A2E]/70 dark:text-white/60 leading-relaxed line-clamp-2">
           {niche.why}
         </p>
 
         <div className="flex items-center justify-between pt-2">
-          <span className="text-xs text-[#1B5E4A] font-medium">
-            Tap for content ideas
+          <span className="text-xs text-[#1B5E4A] dark:text-[#2D9F7D] font-bold">
+            Tap for Content Suite
           </span>
           <motion.div
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1B5E4A]/10 group-hover:bg-[#1B5E4A] transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1B5E4A]/10 dark:bg-white/10 group-hover:bg-[#1B5E4A] dark:group-hover:bg-[#2D9F7D] transition-colors"
             whileHover={{ scale: 1.1 }}
           >
-            <ArrowRight className="w-4 h-4 text-[#1B5E4A] group-hover:text-white transition-colors" />
+            <ArrowRight className="w-4 h-4 text-[#1B5E4A] dark:text-white group-hover:text-white transition-colors" />
           </motion.div>
         </div>
       </div>

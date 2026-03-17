@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowLeft, TrendingUp, AlertCircle } from "lucide-react";
 import { SearchInput } from "@/components/SearchInput";
@@ -93,9 +94,13 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen relative overflow-hidden">
+    <main className="min-h-screen relative overflow-hidden bg-background transition-colors duration-300">
       {/* Ankara pattern background */}
       <div className="ankara-pattern" />
+
+      <div className="relative z-50 px-4 pt-6 flex justify-end max-w-7xl mx-auto">
+        <ThemeToggle />
+      </div>
 
       <div className="relative z-10 px-4 sm:px-6 py-8 sm:py-12">
         <AnimatePresence mode="wait">
@@ -192,10 +197,10 @@ export default function Home() {
                       <TrendingUp className="w-6 h-6 text-[#F4B942]" />
                     </div>
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-[#1A1A2E]">
+                      <h2 className="text-xl sm:text-2xl font-bold text-[#1A1A2E] dark:text-white">
                         Trending for You
                       </h2>
-                      <p className="text-sm text-[#1A1A2E]/50">
+                      <p className="text-sm text-[#1A1A2E]/50 dark:text-white/40">
                         Real-time AI analysis of Nigerian content gaps
                       </p>
                     </div>
@@ -207,7 +212,7 @@ export default function Home() {
                     {[1, 2, 3].map((i) => (
                       <div
                         key={i}
-                        className="h-[250px] bg-white/50 animate-pulse rounded-3xl border border-[#E8E0D8]"
+                        className="h-[250px] bg-white/50 dark:bg-white/5 animate-pulse rounded-3xl border border-[#E8E0D8] dark:border-white/5"
                       />
                     ))}
                   </div>

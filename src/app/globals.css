@@ -99,10 +99,40 @@
   --sidebar-ring: #1B5E4A;
 }
 
+.dark {
+  /* Base colors for dark mode */
+  --background: #0B0E14;
+  /* Deep space navy */
+  --foreground: #F8FAFC;
+  --card: #141824;
+  --card-foreground: #F8FAFC;
+  --popover: #141824;
+  --popover-foreground: #F8FAFC;
+  --primary: #2D9F7D;
+  /* Slightly lighter neon green for dark mode */
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E293B;
+  --secondary-foreground: #F8FAFC;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #F4B942;
+  --accent-foreground: #1A1A2E;
+  --destructive: #FF8585;
+  /* Softer red for dark mode */
+  --border: #2D3748;
+  --input: #2D3748;
+  --ring: #2D9F7D;
+
+  --deep-green: #2D9F7D;
+  --cream: #0B0E14;
+  --soft-black: #F8FAFC;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -163,9 +193,19 @@
   border: 1px solid #FFD4B8;
 }
 
+.dark .card-gradient-1 {
+  background: linear-gradient(135deg, #1A1C23 0%, #252A34 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .card-gradient-2 {
   background: linear-gradient(135deg, #F0FFF4 0%, #D4F5DD 100%);
   border: 1px solid #B8E8C5;
+}
+
+.dark .card-gradient-2 {
+  background: linear-gradient(135deg, #1A231E 0%, #25342A 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .card-gradient-3 {
@@ -173,9 +213,19 @@
   border: 1px solid #FFB8D4;
 }
 
+.dark .card-gradient-3 {
+  background: linear-gradient(135deg, #231A20 0%, #34252E 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .card-gradient-4 {
   background: linear-gradient(135deg, #FFFBF0 0%, #FFF0C4 100%);
   border: 1px solid #FFE694;
+}
+
+.dark .card-gradient-4 {
+  background: linear-gradient(135deg, #23221A 0%, #343325 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .card-gradient-5 {
@@ -183,9 +233,19 @@
   border: 1px solid #B8D9FF;
 }
 
+.dark .card-gradient-5 {
+  background: linear-gradient(135deg, #1A1E23 0%, #252B34 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .card-gradient-6 {
   background: linear-gradient(135deg, #FFF5F0 0%, #FFE0D6 100%);
   border: 1px solid #FFC8B8;
+}
+
+.dark .card-gradient-6 {
+  background: linear-gradient(135deg, #231E1A 0%, #342B25 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Loading shimmer animation */
@@ -193,6 +253,7 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }

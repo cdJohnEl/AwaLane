@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { searchYouTubeNiche } from "@/lib/youtube";
 
 const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY || "",
   baseURL: "https://api.groq.com/openai/v1",
 });
 
-if (!process.env.GROQ_API_KEY) {
-  console.warn("WARNING: GROQ_API_KEY is not defined in environment variables");
-}
-
 const SYSTEM_PROMPT = `You are a Nigerian social media trend analyst specializing in TikTok, YouTube, and Instagram content strategy. You help creators find underserved niches.
+Ground your analysis in the provided real-world YouTube search results to assess current competition.
 
 When given a content idea, analyze it and return EXACTLY 6-8 related niche suggestions in JSON format. Consider:
 - Current Nigerian social media landscape and culture
@@ -31,7 +29,7 @@ Return ONLY valid JSON in this exact format, no other text:
       "name": "Niche name here",
       "saturation": "open",
       "saturationLabel": "Open lane",
-      "why": "One sentence explaining why this is good or bad",
+      "why": "One sentence explaining why this is good or bad, citing competition levels if possible.",
       "twists": [
         "Specific content idea 1",
         "Specific content idea 2",
@@ -55,6 +53,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 });
     }
 
+    // Fetch real-world context from YouTube
+    const ytResults = await searchYouTubeNiche(query);
+    const searchContext = ytResults && ytResults.length > 0
+      ? `Existing top results on YouTube for "${query}": ${ytResults.map((r: any) => r.snippet.title).join(", ")}`
+      : "No major competition found in recent YouTube search results for this specific term.";
+
     const platformContext =
       platform && platform !== "all"
         ? `Focus specifically on ${platform} opportunities.`
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest) {
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Analyze this content idea for Nigerian creators: "${query}"\n\n${platformContext}\n\nReturn JSON with 6-8 niche suggestions.`,
+          content: `Analyze this content idea for Nigerian creators: "${query}"\n\n${platformContext}\n\nReal-world YouTube Context: ${searchContext}\n\nReturn JSON with 6-8 niche suggestions.`,
         },
       ],
       temperature: 0.7,

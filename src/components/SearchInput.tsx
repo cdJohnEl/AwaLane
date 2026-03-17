@@ -46,16 +46,16 @@ export function SearchInput({ onSearch, isSearching }: SearchInputProps) {
     >
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-[#1B5E4A] via-[#F4B942] to-[#FF6B6B] rounded-3xl blur-xl opacity-20" />
-        <div className="relative flex items-center bg-white rounded-3xl shadow-xl shadow-black/5 border border-[#E8E0D8] overflow-hidden">
+        <div className="relative flex items-center bg-white dark:bg-[#141824] rounded-3xl shadow-xl shadow-black/5 border border-[#E8E0D8] dark:border-white/10 overflow-hidden transition-colors">
           <div className="flex-1 flex items-center">
-            <Search className="w-5 h-5 text-[#1B5E4A]/50 ml-5" />
+            <Search className="w-5 h-5 text-[#1B5E4A]/50 dark:text-white/30 ml-5" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={placeholder}
               disabled={isSearching}
-              className="flex-1 px-4 py-5 text-base sm:text-lg text-[#1A1A2E] placeholder:text-[#1A1A2E]/40 bg-transparent outline-none disabled:opacity-50"
+              className="flex-1 px-4 py-5 text-base sm:text-lg text-[#1A1A2E] dark:text-white placeholder:text-[#1A1A2E]/40 dark:placeholder:text-white/30 bg-transparent outline-none disabled:opacity-50"
             />
           </div>
           <motion.button

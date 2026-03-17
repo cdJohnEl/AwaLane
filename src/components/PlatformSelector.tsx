@@ -59,10 +59,9 @@ export function PlatformSelector({ selected, onSelect }: PlatformSelectorProps) 
           className={`
             flex items-center gap-2 px-4 py-2.5 rounded-2xl font-medium text-sm
             transition-all duration-200
-            ${
-              selected === platform.id
-                ? "bg-[#1B5E4A] text-white shadow-lg shadow-[#1B5E4A]/25"
-                : "bg-white/80 text-[#1A1A2E] hover:bg-white border border-[#E8E0D8]"
+            ${selected === platform.id
+              ? "bg-[#1B5E4A] dark:bg-[#2D9F7D] text-white shadow-lg shadow-[#1B5E4A]/25 dark:shadow-[#2D9F7D]/20"
+              : "bg-white/80 dark:bg-white/10 text-[#1A1A2E] dark:text-white hover:bg-white dark:hover:bg-white/20 border border-[#E8E0D8] dark:border-white/10"
             }
           `}
         >

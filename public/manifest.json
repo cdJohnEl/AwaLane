@@ -1,0 +1,16 @@
+{
+  "name": "AwaLane | Discover Your Unique Voice",
+  "short_name": "AwaLane",
+  "description": "Find your unique content lane as a Nigerian creator.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8F0",
+  "theme_color": "#1B5E4A",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
