@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getTrendingVideos, searchYouTubeNiche } from "@/lib/youtube";
 import { getDailyTrends, getRealTimeTrends, searchTrends } from "@/lib/google-trends";
 
