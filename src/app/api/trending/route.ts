@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getTrendingVideos } from "@/lib/youtube";
+import { getDailyTrends, getRealTimeTrends } from "@/lib/google-trends";
+import { mockNicheResults } from "@/lib/mock-data";
 
 const client = new OpenAI({
     apiKey: process.env.GROQ_API_KEY || "",
@@ -40,11 +42,59 @@ export async function GET() {
             throw new Error("GROQ_API_KEY is not defined");
         }
 
-        // Fetch real trends from YouTube Data API
+        // Fetch real trends from multiple sources
         const youtubeTrends = await getTrendingVideos();
-        const trendsContext = youtubeTrends.length > 0
-            ? `Current real-time YouTube trends in Nigeria: ${youtubeTrends.map((v: any) => v.title).join(", ")}`
+        const googleDailyTrends = await getDailyTrends('NG');
+        const googleRealTimeTrends = await getRealTimeTrends('NG');
+
+        console.log('Fetched real data:', {
+            youtube: youtubeTrends.length,
+            googleDaily: googleDailyTrends.length,
+            googleRealTime: googleRealTimeTrends.length
+        });
+
+        // Combine all trend data for richer context
+        const youtubeTitles = youtubeTrends.map((v: any) => v.title).slice(0, 5);
+        const googleTrendTitles = [
+            ...googleDailyTrends.slice(0, 5).map((t: any) => t.title),
+            ...googleRealTimeTrends.slice(0, 5).map((t: any) => t.title)
+        ];
+
+        const allTrends = [...youtubeTitles, ...googleTrendTitles];
+        const hasRealData = allTrends.length > 0;
+
+        const trendsContext = hasRealData
+            ? `CURRENT REAL-TIME DATA FOR NIGERIA:\n\n📺 YOUTUBE TRENDING: ${youtubeTitles.join(" | ")}\n\n${googleTrendTitles.length > 0 ? `🔥 GOOGLE SEARCH TRENDS: ${googleTrendTitles.slice(0, 8).join(" | ")}` : ''}\n\nUse this real data to identify underserved niches and content opportunities.`
             : "Focus on general high-potential Nigerian creator niches.";
+
+        // If no Groq API key, return mock data with real YouTube trends mixed in
+        if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === 'your_groq_api_key_here') {
+            console.warn('Groq API key not configured, using mock data');
+
+            // Return a mix of mock data and real YouTube trends
+            const mixedNiches = hasRealData ? [
+                ...mockNicheResults.slice(0, 4),
+                {
+                    ...mockNicheResults[0],
+                    id: 'yt-trend-1',
+                    name: `Based on YouTube Trending: ${youtubeTitles[0]?.substring(0, 30) || 'Trending Nigerian Content'}`,
+                    why: `Currently trending in Nigeria with high engagement. YouTube data shows strong interest in this topic.`,
+                    twists: youtubeTitles.slice(0, 4).map((title: string, i: number) =>
+                        `Create content around: ${title.substring(0, 50)}...`
+                    )
+                }
+            ] : mockNicheResults;
+
+            const gradients = ["card-gradient-1", "card-gradient-2", "card-gradient-3", "card-gradient-4", "card-gradient-5", "card-gradient-6"];
+
+            return NextResponse.json({
+                niches: mixedNiches.map((niche: any, index: number) => ({
+                    ...niche,
+                    cardGradient: gradients[index % gradients.length]
+                })),
+                warning: "Using mock data - Groq API key not configured"
+            });
+        }
 
         const response = await client.chat.completions.create({
             model: "llama-3.3-70b-versatile",

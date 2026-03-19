@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { searchYouTubeNiche } from "@/lib/youtube";
+import { searchTrends, getDailyTrends } from "@/lib/google-trends";
 
 const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY || "",
@@ -8,13 +9,14 @@ const client = new OpenAI({
 });
 
 const SYSTEM_PROMPT = `You are a Nigerian social media trend analyst specializing in TikTok, YouTube, and Instagram content strategy. You help creators find underserved niches.
-Ground your analysis in the provided real-world YouTube search results to assess current competition.
+Ground your analysis in the provided real-world YouTube search results and Google Trends data to assess current competition and search interest.
 
 When given a content idea, analyze it and return EXACTLY 6-8 related niche suggestions in JSON format. Consider:
 - Current Nigerian social media landscape and culture
-- What's oversaturated vs. what has room to grow
+- What's oversaturated vs. what has room to grow (based on YouTube competition)
 - Local trends, Pidgin English angles, and cultural relevance
 - Platform-specific opportunities (TikTok vs YouTube vs Instagram)
+- Search interest levels from Google Trends (higher interest = more demand)
 
 For each niche, assess saturation:
 - "open" = Few creators, high opportunity
@@ -53,11 +55,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 });
     }
 
-    // Fetch real-world context from YouTube
-    const ytResults = await searchYouTubeNiche(query);
-    const searchContext = ytResults && ytResults.length > 0
-      ? `Existing top results on YouTube for "${query}": ${ytResults.map((r: any) => r.snippet.title).join(", ")}`
-      : "No major competition found in recent YouTube search results for this specific term.";
+    // Fetch real-world context from YouTube and Google Trends
+    const [ytResults, googleTrendData, googleDaily] = await Promise.all([
+        searchYouTubeNiche(query),
+        searchTrends(query, 'NG'),
+        getDailyTrends('NG')
+    ]);
+
+    const youtubeContext = ytResults && ytResults.length > 0
+        ? `📺 EXISTING YOUTUBE COMPETITION: ${ytResults.slice(0, 5).map((r: any) => r.snippet.title).join(", ")}`
+        : "📺 No major competition found in recent YouTube search results for this specific term.";
+
+    const googleTrendsContext = googleTrendData && googleTrendData.default
+        ? `🔥 GOOGLE TRENDS INTEREST: People are actively searching for topics related to "${query}"`
+        : "";
+
+    const broaderTrendsContext = googleDaily && googleDaily.length > 0
+        ? `📈 RELATED SEARCH TRENDS IN NIGERIA: ${googleDaily.slice(0, 3).map((t: any) => t.title).join(", ")}`
+        : "";
+
+    const searchContext = `${youtubeContext}\n${googleTrendsContext}\n${broaderTrendsContext}`.trim();
 
     const platformContext =
       platform && platform !== "all"
@@ -72,7 +89,7 @@ export async function POST(request: NextRequest) {
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Analyze this content idea for Nigerian creators: "${query}"\n\n${platformContext}\n\nReal-world YouTube Context: ${searchContext}\n\nReturn JSON with 6-8 niche suggestions.`,
+          content: `Analyze this content idea for Nigerian creators: "${query}"\n\n${platformContext}\n\n📊 REAL-TIME MARKET DATA:\n${searchContext}\n\nUse this real data to identify underserved niches, assess competition levels, and find content opportunities that align with current search demand. Return JSON with 6-8 niche suggestions.`,
         },
       ],
       temperature: 0.7,
