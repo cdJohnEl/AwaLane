@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Lightbulb, X, Sparkles, Download } from "lucide-react";
-import { toJpeg } from "html-to-image";
+import { toPng } from "html-to-image";
 import {
   Dialog,
   DialogContent,
@@ -29,12 +29,22 @@ export function IdeaModal({ niche, open, onOpenChange }: IdeaModalProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"twists" | "script" | "hooks" | "seo">("twists");
   const [generationLoading, setGenerationLoading] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<Record<string, string>>({});
+  const [generatedContent, setGeneratedContent] = useState<Record<string, any>>({});
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Reset state when niche changes to avoid showing content from previous niche
+  useEffect(() => {
+    if (niche) {
+      setGeneratedContent({});
+      setActiveTab("twists");
+    }
+  }, [niche?.id]);
 
   const copyToClipboard = async (text: string, index: number | string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      // Handle JSON objects if they are passed to copy
+      const textToCopy = typeof text === "object" ? JSON.stringify(text, null, 2) : text;
+      await navigator.clipboard.writeText(textToCopy);
       setCopiedIndex(typeof index === "number" ? index : 999);
       setTimeout(() => setCopiedIndex(null), 2000);
     } catch {
@@ -79,15 +89,19 @@ export function IdeaModal({ niche, open, onOpenChange }: IdeaModalProps) {
     if (!modalRef.current || !niche) return;
 
     try {
-      const dataUrl = await toJpeg(modalRef.current, {
-        quality: 0.95,
+      // Use toPng for better fidelity and higher resolution
+      const dataUrl = await toPng(modalRef.current, {
+        quality: 1,
+        pixelRatio: 2, // High resolution (retina-like)
         backgroundColor: "#FFF8F0",
+        // Force full height capture
+        height: modalRef.current.scrollHeight,
         style: {
           borderRadius: "0",
         }
       });
       const link = document.createElement("a");
-      link.download = `awalane-${niche.name.toLowerCase().replace(/\s+/g, "-")}-report.jpg`;
+      link.download = `awalane-${niche.name.toLowerCase().replace(/\s+/g, "-")}-report.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -229,8 +243,47 @@ export function IdeaModal({ niche, open, onOpenChange }: IdeaModalProps) {
                               {copiedIndex === 999 ? "COPIED" : "COPY ALL"}
                             </Button>
                           </div>
-                          <div className="whitespace-pre-wrap text-sm text-[#1A1A2E] dark:text-white/80 leading-relaxed bg-[#FFF8F0] dark:bg-white/5 p-5 rounded-xl border border-[#E8E0D8] dark:border-white/5 font-medium shadow-inner">
-                            {generatedContent[activeTab]}
+                          <div className="space-y-4">
+                            {activeTab === "hooks" && generatedContent["hooks"]?.hooks ? (
+                              <div className="space-y-3">
+                                {generatedContent["hooks"].hooks.map((hook: string, i: number) => (
+                                  <div key={i} className="bg-[#FFF8F0] dark:bg-white/5 p-4 rounded-xl border border-[#E8E0D8] dark:border-white/5 flex gap-3 items-start group hover:border-[#1B5E4A]/30 transition-colors">
+                                    <span className="text-xs font-bold text-[#1B5E4A] dark:text-[#2D9F7D] mt-0.5">{i + 1}.</span>
+                                    <p className="text-sm text-[#1A1A2E] dark:text-white/80 leading-relaxed font-medium">{hook}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : activeTab === "seo" && generatedContent["seo"]?.titles ? (
+                              <div className="space-y-6">
+                                <div>
+                                  <h5 className="text-[10px] uppercase tracking-widest font-black text-[#1A1A2E]/40 dark:text-white/30 mb-3 ml-1">Viral Titles</h5>
+                                  <div className="space-y-2">
+                                    {generatedContent["seo"].titles.map((title: string, i: number) => (
+                                      <div key={i} className="bg-[#FFF8F0] dark:bg-white/5 px-4 py-3 rounded-xl border border-[#E8E0D8] dark:border-white/5 text-sm text-[#1A1A2E] dark:text-white/80 font-bold">
+                                        {title}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="pt-2">
+                                  <h5 className="text-[10px] uppercase tracking-widest font-black text-[#1A1A2E]/40 dark:text-white/30 mb-3 ml-1">Trending Hashtags</h5>
+                                  <div className="flex flex-wrap gap-2">
+                                    {generatedContent["seo"].hashtags.map((tag: string, i: number) => (
+                                      <span key={i} className="px-3 py-1.5 bg-[#1B5E4A]/5 dark:bg-white/5 text-[#1B5E4A] dark:text-[#2D9F7D] rounded-full text-xs font-bold border border-[#1B5E4A]/10">
+                                        {tag.startsWith('#') ? tag : `#${tag}`}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="whitespace-pre-wrap text-sm text-[#1A1A2E] dark:text-white/80 leading-relaxed bg-[#FFF8F0] dark:bg-white/5 p-5 rounded-xl border border-[#E8E0D8] dark:border-white/5 font-medium shadow-inner">
+                                {typeof generatedContent[activeTab] === 'string' 
+                                  ? generatedContent[activeTab] 
+                                  : JSON.stringify(generatedContent[activeTab], null, 2)
+                                }
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}

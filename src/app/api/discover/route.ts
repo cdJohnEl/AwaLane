@@ -14,7 +14,7 @@ Ground your analysis in the provided real-world YouTube search results and Googl
 When given a content idea, analyze it and return EXACTLY 6-8 related niche suggestions in JSON format. Consider:
 - Current Nigerian social media landscape and culture
 - What's oversaturated vs. what has room to grow (based on YouTube competition)
-- Local trends, Pidgin English angles, and cultural relevance
+- Local trends and cultural relevance using simple, clear English. Avoid over-exaggerated Pidgin or heavy slang.
 - Platform-specific opportunities (TikTok vs YouTube vs Instagram)
 - Search interest levels from Google Trends (higher interest = more demand)
 
@@ -23,7 +23,9 @@ For each niche, assess saturation:
 - "busy" = Growing competition but still viable
 - "crowded" = Very saturated, hard to stand out
 
-Return ONLY valid JSON in this exact format, no other text:
+IMPORTANT: Return ONLY valid JSON in this exact format, no other text.
+Do NOT use markdown bolding (**text**) or italics (*text*) inside the JSON strings. Use plain text only.
+
 {
   "niches": [
     {
@@ -108,7 +110,19 @@ export async function POST(request: NextRequest) {
       jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "");
     }
 
-    const data = JSON.parse(jsonStr.trim());
+    const rawData = JSON.parse(jsonStr.trim());
+
+    // Sanitize data to remove any accidental asterisks
+    const sanitize = (str: string) => str.replace(/\*\*/g, "").replace(/\*/g, "");
+    
+    const data = {
+      niches: rawData.niches.map((niche: any) => ({
+        ...niche,
+        name: sanitize(niche.name),
+        why: sanitize(niche.why),
+        twists: niche.twists.map((t: string) => sanitize(t))
+      }))
+    };
 
     // Add card gradients
     const gradients = [

@@ -8,8 +8,9 @@ const client = new OpenAI({
 
 const SYSTEM_PROMPT = `You are a viral content strategist for Nigerian creators on TikTok, YouTube, and Instagram. 
 Your goal is to provide highly actionable, culturally relevant, and high-energy content.
-Use Nigerian Pidgin and local slang (e.g., "no cap", "lamba", "japa", "steeze") where appropriate to make it sound authentic.
-Focus on the Nigerian market but maintain high production quality standards.`;
+Use clear, simple English that is easy to understand. Avoid over-exaggerated Pidgin or heavy slang.
+Focus on the Nigerian market but maintain high production quality standards.
+Do NOT use markdown formatting like bolding (**text**) or italics (*text*). Use plain text only.`;
 
 export async function POST(req: Request) {
     if (!process.env.GROQ_API_KEY) {
@@ -29,19 +30,22 @@ export async function POST(req: Request) {
       The specific angle is: "${twist}".
       Platform: ${platform}.
       Structure:
-      1. Hook (0-5s): Catchy, visual, or controversial.
-      2. Body (5-50s): Fast-paced, educational or entertaining.
-      3. Call to Action (50-60s): Relatable and direct.
-      Include stage directions in [brackets].`;
+      - Hook (0-5s)
+      - Body (5-50s)
+      - Call to Action (50-60s)
+      Include stage directions in [brackets].
+      IMPORTANT: Return plain text only. Do NOT use markdown bolding (**) or italics (*).`;
         } else if (type === "hooks") {
             userPrompt = `Generate 5 viral hooks for this niche: "${niche}".
       Angle: "${twist}".
       Platform: ${platform}.
-      Make them extremely clickable and relatable to Nigerians. Mix English and Pidgin.`;
+      Return ONLY a JSON object with a "hooks" field containing an array of 5 strings.
+      No other text. No markdown. No bolding.`;
         } else if (type === "seo") {
             userPrompt = `Generate 5 viral YouTube/Instagram titles and 10 trending hashtags for this niche: "${niche}".
       Angle: "${twist}".
-      Optimize for the Nigerian algorithm.`;
+      Return ONLY a JSON object with "titles" (array of 5) and "hashtags" (array of 10) fields.
+      No other text. No markdown. No bolding.`;
         }
 
         const response = await client.chat.completions.create({
@@ -54,9 +58,24 @@ export async function POST(req: Request) {
             max_tokens: 2048,
         });
 
-        const content = response.choices[0].message.content;
+        const content = response.choices[0].message.content || "";
+        
+        // Try to parse as JSON if it's hooks or seo
+        if (type === "hooks" || type === "seo") {
+            let jsonStr = content;
+            if (content.includes("```")) {
+                jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+            }
+            try {
+                const data = JSON.parse(jsonStr.trim());
+                return NextResponse.json({ result: data, isJson: true });
+            } catch (e) {
+                console.warn("Failed to parse JSON for", type, content);
+            }
+        }
 
-        return NextResponse.json({ result: content });
+        const cleanContent = content.replace(/\*\*/g, "").replace(/\*/g, "");
+        return NextResponse.json({ result: cleanContent, isJson: false });
     } catch (error: any) {
         console.error("Generation Error:", error);
         return NextResponse.json(

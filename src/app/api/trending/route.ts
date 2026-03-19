@@ -12,9 +12,11 @@ const client = new OpenAI({
 const SYSTEM_PROMPT = `You are a Nigerian social media trend analyst specializing in TikTok, YouTube, and Instagram. 
 Ground your analysis in the provided real-time YouTube trending data for Nigeria. 
 Identify 6 CURRENTLY trending or high-potential underserved niches specifically for Nigerian creators. 
-Consider local culture, current events in Nigeria, and underserved audiences.
+Consider local culture, current events in Nigeria, and underserved audiences. Use simple, clear English. Avoid over-exaggerated Pidgin or heavy slang.
 
-Return ONLY valid JSON in this exact format:
+IMPORTANT: Return ONLY valid JSON in this exact format.
+Do NOT use markdown bolding (**text**) or italics (*text*) inside the JSON strings. Use plain text only.
+
 {
   "niches": [
     {
@@ -120,7 +122,19 @@ export async function GET() {
             jsonStr = content.replace(/```json\n?/g, "").replace(/```\n?/g, "");
         }
 
-        const data = JSON.parse(jsonStr.trim());
+        const rawData = JSON.parse(jsonStr.trim());
+
+        // Sanitize data to remove any accidental asterisks
+        const sanitize = (str: string) => str.replace(/\*\*/g, "").replace(/\*/g, "");
+        
+        const data = {
+            niches: rawData.niches.map((niche: any) => ({
+                ...niche,
+                name: sanitize(niche.name),
+                why: sanitize(niche.why),
+                twists: niche.twists.map((t: string) => sanitize(t))
+            }))
+        };
 
         // Add card gradients
         const gradients = [
